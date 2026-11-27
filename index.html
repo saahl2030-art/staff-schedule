@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>نظام الدوام والإجازات</title>
+
+  <style>
+    :root {
+      --navy: #18356f;
+      --gold: #c5a45b;
+      --background: #f4f7fb;
+      --border: #dce4ef;
+      --text: #1d2e4a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: white;
+      border-bottom: 3px solid var(--gold);
+      text-align: center;
+      padding: 24px 16px;
+    }
+
+    .logo {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 8px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: var(--navy);
+      color: white;
+      font-weight: bold;
+      font-size: 21px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 25px;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      color: #65758d;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 22px 16px;
+    }
+
+    .notice {
+      background: #fff8df;
+      border: 1px solid #ead89c;
+      color: #665316;
+      border-radius: 12px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      color: var(--navy);
+      margin: 0;
+      font-size: 22px;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 16px;
+      background: var(--navy);
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button.secondary {
+      background: #eaf0f8;
+      color: var(--navy);
+    }
+
+    button.danger {
+      background: #fff0f0;
+      color: #a32b2b;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .card,
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .card h3 {
+      color: var(--navy);
+      margin: 0 0 8px;
+    }
+
+    .card p {
+      color: #697992;
+      margin: 0 0 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .empty {
+      background: white;
+      border: 1px dashed #cbd7e5;
+      border-radius: 14px;
+      padding: 35px 20px;
+      text-align: center;
+      color: #697992;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-left: 5px;
+    }
+
+    .green { background: #b7e5c5; }
+    .yellow { background: #f8e8a5; }
+    .blue { background: #bddaf5; }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+      background: white;
+    }
+
+    th,
+    td {
+      padding: 10px 7px;
+      text-align: center;
+      border: 1px solid #e3eaf3;
+      font-size: 13px;
+    }
+
+    th:first-child {
+      position: sticky;
+      right: 0;
+      background: #f8faff;
+      min-width: 145px;
+      z-index: 1;
+    }
+
+    td.work { background: #d8f1de; }
+    td.off { background: #fff2bc; }
+    td.leave { background: #d5eafa; }
+
+    td[data-day] {
+      cursor: pointer;
+    }
+
+    dialog {
+      width: min(400px, 92%);
+      border: 0;
+      border-radius: 15px;
+      padding: 22px;
+      color: var(--text);
+    }
+
+    dialog::backdrop {
+      background: rgba(10, 25, 48, 0.45);
+    }
+
+    dialog h3 {
+      margin-top: 0;
+      color: var(--navy);
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cad6e5;
+      border-radius: 8px;
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 16px 10px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      h2 {
+        font-size: 19px;
+      }
+
+      main {
+        padding: 15px 10px;
+      }
+
+      .panel {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">S</div>
+  <h1>نظام الدوام والإجازات</h1>
+  <p>تنظيم الدوام بسهولة ووضوح</p>
+</header>
+
+<main>
+  <div class="notice">
+    نسخة واجهة للتجربة فقط: البيانات لا تُحفظ بعد.
+    لا تدخل أسماء أو أرقام هواتف حقيقية الآن.
+  </div>
+
+  <section id="departmentsPage">
+    <div class="toolbar">
+      <h2>الأقسام</h2>
+      <button id="addDepartment">+ إضافة قسم</button>
+    </div>
+
+    <div id="departmentList" class="cards"></div>
+  </section>
+
+  <section id="departmentPage" class="hidden">
+    <div class="toolbar">
+      <h2 id="departmentTitle"></h2>
+
+      <div class="actions">
+        <button class="secondary" id="backButton">رجوع</button>
+        <button id="addEmployee">+ إضافة موظف</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="toolbar">
+        <div class="actions">
+          <button class="secondary" id="previousWeek">الأسبوع السابق</button>
+          <button class="secondary" id="currentWeek">هذا الأسبوع</button>
+          <button class="secondary" id="nextWeek">الأسبوع التالي</button>
+        </div>
+
+        <strong id="weekTitle"></strong>
+      </div>
+
+      <div class="legend">
+        <span><i class="dot green"></i> دوام</span>
+        <span><i class="dot yellow"></i> إجازة</span>
+        <span><i class="dot blue"></i> إجازة خاصة</span>
+      </div>
+
+      <p>
+        اضغط على أي يوم لتجربة تغيير حالته.
+      </p>
+
+      <div class="table-wrap">
+        <table id="scheduleTable"></table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="formDialog">
+  <form id="dataForm">
+    <h3 id="dialogTitle"></h3>
+    <div id="formFields"></div>
+
+    <div class="dialog-actions">
+      <button type="submit">حفظ</button>
+      <button type="button" class="secondary" id="cancelDialog">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  /*
+    هذه نسخة تجريبية في الذاكرة فقط.
+    لا تحفظ بيانات في المتصفح أو قاعدة البيانات.
+  */
+
+  const departments = [];
+
+  let currentDepartment = null;
+  let currentWeekOffset = 0;
+  let saveHandler = null;
+
+  const departmentsPage = document.getElementById("departmentsPage");
+  const departmentPage = document.getElementById("departmentPage");
+  const departmentList = document.getElementById("departmentList");
+  const departmentTitle = document.getElementById("departmentTitle");
+  const scheduleTable = document.getElementById("scheduleTable");
+  const weekTitle = document.getElementById("weekTitle");
+  const dialog = document.getElementById("formDialog");
+  const dataForm = document.getElementById("dataForm");
+  const dialogTitle = document.getElementById("dialogTitle");
+  const formFields = document.getElementById("formFields");
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function(character) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[character];
+    });
+  }
+
+  function makeId() {
+    return crypto.randomUUID();
+  }
+
+  function openForm(title, fields, handler) {
+    dialogTitle.textContent = title;
+    formFields.innerHTML = fields;
+    saveHandler = handler;
+    dialog.showModal();
+  }
+
+  document.getElementById("cancelDialog").onclick = function() {
+    dialog.close();
+  };
+
+  dataForm.onsubmit = function(event) {
+    event.preventDefault();
+
+    const values = Object.fromEntries(new FormData(dataForm));
+
+    if (saveHandler) {
+      saveHandler(values);
+    }
+
+    dialog.close();
+  };
+
+  function renderDepartments() {
+    departmentList.innerHTML = "";
+
+    if (departments.length === 0) {
+      departmentList.innerHTML = `
+        <div class="empty">
+          لا توجد أقسام بعد. اضغط «إضافة قسم» للتجربة.
+        </div>
+      `;
+
+      return;
+    }
+
+    departments.forEach(function(department) {
+      const card = document.createElement("article");
+      card.className = "card";
+
+      card.innerHTML = `
+        <h3>${escapeHTML(department.name)}</h3>
+        <p>${department.employees.length} موظف</p>
+
+        <div class="actions">
+          <button data-action="open">فتح القسم</button>
+          <button class="secondary" data-action="edit">تعديل</button>
+          <button class="danger" data-action="delete">حذف</button>
+        </div>
+      `;
+
+      card.querySelector('[data-action="open"]').onclick = function() {
+        currentDepartment = department;
+        currentWeekOffset = 0;
+        openDepartment();
+      };
+
+      card.querySelector('[data-action="edit"]').onclick = function() {
+        openForm(
+          "تعديل اسم القسم",
+          `
+            <label for="departmentName">اسم القسم</label>
+            <input
+              id="departmentName"
+              name="name"
+              value="${escapeHTML(department.name)}"
+              required
+            >
+          `,
+          function(values) {
+            department.name = values.name.trim();
+            renderDepartments();
+          }
+        );
+      };
+
+      card.querySelector('[data-action="delete"]').onclick = function() {
+        if (!confirm("هل تريد حذف القسم وموظفيه من هذه التجربة؟")) {
+          return;
+        }
+
+        const index = departments.findIndex(function(item) {
+          return item.id === department.id;
+        });
+
+        departments.splice(index, 1);
+        renderDepartments();
+      };
+
+      departmentList.appendChild(card);
+    });
+  }
+
+  document.getElementById("addDepartment").onclick = function() {
+    openForm(
+      "إضافة قسم",
+      `
+        <label for="departmentName">اسم القسم</label>
+        <input
+          id="departmentName"
+          name="name"
+          placeholder="مثال: خدمة العملاء"
+          required
+        >
+      `,
+      function(values) {
+        departments.push({
+          id: makeId(),
+          name: values.name.trim(),
+          employees: []
+        });
+
+        renderDepartments();
+      }
+    );
+  };
+
+  function openDepartment() {
+    departmentsPage.classList.add("hidden");
+    departmentPage.classList.remove("hidden");
+
+    departmentTitle.textContent = currentDepartment.name;
+
+    renderSchedule();
+  }
+
+  document.getElementById("backButton").onclick = function() {
+    departmentPage.classList.add("hidden");
+    departmentsPage.classList.remove("hidden");
+
+    currentDepartment = null;
+    renderDepartments();
+  };
+
+  document.getElementById("addEmployee").onclick = function() {
+    openForm(
+      "إضافة موظف تجريبي",
+      `
+        <label for="employeeName">اسم الموظف</label>
+        <input
+          id="employeeName"
+          name="name"
+          placeholder="اسم تجريبي فقط"
+          required
+        >
+
+        <label for="employeePhone">رقم الهاتف</label>
+        <input
+          id="employeePhone"
+          name="phone"
+          type="tel"
+          placeholder="لا تدخل رقماً حقيقياً الآن"
+        >
+
+        <label for="employeeGroup">مجموعة التناوب</label>
+        <select id="employeeGroup" name="group">
+          <option value="0">المجموعة الأولى</option>
+          <option value="1">المجموعة الثانية</option>
+        </select>
+      `,
+      function(values) {
+        currentDepartment.employees.push({
+          id: makeId(),
+          name: values.name.trim(),
+          phone: values.phone.trim(),
+          group: Number(values.group),
+          changes: {}
+        });
+
+        renderSchedule();
+      }
+    );
+  };
+
+  function startOfWeek(offset) {
+    const now = new Date();
+    const date = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+    // بداية الأسبوع: الاثنين.
+    const daysSinceMonday = (date.getDay() + 6) % 7;
+
+    date.setDate(date.getDate() - daysSinceMonday + offset * 7);
+
+    return date;
+  }
+
+  function dateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function defaultStatus(date, employee) {
+    const weekday = date.getDay();
+
+    if (weekday === 0) {
+      return "off";
+    }
+
+    if (weekday >= 1 && weekday <= 4) {
+      return "work";
+    }
+
+    // مرجع تجريبي لحساب تبادل الجمعة والسبت.
+    const reference = Date.UTC(2026, 10, 2);
+    const current = Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+    const week = Math.floor((current - reference) / 604800000);
+    const phase = ((week + employee.group) % 2 + 2) % 2;
+
+    if (weekday === 5) {
+      return phase === 0 ? "work" : "off";
+    }
+
+    return phase === 1 ? "work" : "off";
+  }
+
+  function renderSchedule() {
+    if (!currentDepartment) return;
+
+    const firstDay = startOfWeek(currentWeekOffset);
+
+    const days = Array.from({ length: 7 }, function(_, index) {
+      const date = new Date(firstDay);
+      date.setDate(firstDay.getDate() + index);
+      return date;
+    });
+
+    weekTitle.textContent =
+      days[0].toLocaleDateString("ar-AE") +
+      " - " +
+      days[6].toLocaleDateString("ar-AE");
+
+    const headings = days.map(function(date) {
+      const weekday = date.toLocaleDateString("ar-AE", {
+        weekday: "short"
+      });
+
+      return `
+        <th>
+          ${escapeHTML(weekday)}<br>
+          ${date.getDate()}/${date.getMonth() + 1}
+        </th>
+      `;
+    }).join("");
+
+    let rows = "";
+
+    currentDepartment.employees.forEach(function(employee) {
+      const cells = days.map(function(date) {
+        const key = dateKey(date);
+        const status = employee.changes[key] || defaultStatus(date, employee);
+
+        const labels = {
+          work: "دوام",
+          off: "إجازة",
+          leave: "إجازة خاصة"
+        };
+
+        return `
+          <td
+            class="${status}"
+            data-day="${key}"
+            data-employee="${employee.id}"
+          >
+            ${labels[status]}
+          </td>
+        `;
+      }).join("");
+
+      rows += `
+        <tr>
+          <th>
+            ${escapeHTML(employee.name)}
+            <br>
+            <button
+              class="danger"
+              data-remove-employee="${employee.id}"
+              type="button"
+            >
+              حذف
+            </button>
+          </th>
+          ${cells}
+        </tr>
+      `;
+    });
+
+    scheduleTable.innerHTML = `
+      <thead>
+        <tr>
+          <th>الموظف</th>
+          ${headings}
+        </tr>
+      </thead>
+      <tbody>
+        ${
+          rows ||
+          `<tr><td colspan="8">لا يوجد موظفون في القسم بعد.</td></tr>`
+        }
+      </tbody>
+    `;
+
+    scheduleTable.querySelectorAll("[data-day]").forEach(function(cell) {
+      cell.onclick = function() {
+        const employee = currentDepartment.employees.find(function(item) {
+          return item.id === cell.dataset.employee;
+        });
+
+        const day = cell.dataset.day;
+
+        openForm(
+          "تعديل حالة اليوم",
+          `
+            <label for="dayStatus">الحالة</label>
+
+            <select id="dayStatus" name="status">
+              <option value="auto">تلقائي</option>
+              <option value="work">دوام</option>
+              <option value="off">إجازة</option>
+              <option value="leave">إجازة خاصة</option>
+            </select>
+          `,
+          function(values) {
+            if (values.status === "auto") {
+              delete employee.changes[day];
+            } else {
+              employee.changes[day] = values.status;
+            }
+
+            renderSchedule();
+          }
+        );
+      };
+    });
+
+    scheduleTable.querySelectorAll("[data-remove-employee]").forEach(
+      function(button) {
+        button.onclick = function() {
+          if (!confirm("هل تريد حذف الموظف من هذه التجربة؟")) {
+            return;
+          }
+
+          currentDepartment.employees =
+            currentDepartment.employees.filter(function(employee) {
+              return employee.id !== button.dataset.removeEmployee;
+            });
+
+          renderSchedule();
+        };
+      }
+    );
+  }
+
+  document.getElementById("previousWeek").onclick = function() {
+    currentWeekOffset--;
+    renderSchedule();
+  };
+
+  document.getElementById("currentWeek").onclick = function() {
+    currentWeekOffset = 0;
+    renderSchedule();
+  };
+
+  document.getElementById("nextWeek").onclick = function() {
+    currentWeekOffset++;
+    renderSchedule();
+  };
+
+  renderDepartments();
+</script>
+
+</body>
+</html>
